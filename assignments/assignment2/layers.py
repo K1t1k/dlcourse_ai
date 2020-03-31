@@ -61,8 +61,8 @@ def l2_regularization(W, reg_strength):
       gradient, np.array same shape as W - gradient of weight by l2 loss
     """
 
-    loss = np.sum(w * w) * reg_strength
-    grad = reg_strength * w * 2
+    loss = np.sum(W * W) * reg_strength
+    grad = reg_strength * W * 2
     
     return loss, grad
 
@@ -136,6 +136,9 @@ class ReLULayer:
         # ReLU Doesn't have any parameters
         return {}
 
+    def reset_grad(self):
+        pass
+
 
 class FullyConnectedLayer:
     def __init__(self, n_input, n_output):
@@ -144,9 +147,9 @@ class FullyConnectedLayer:
         self.X = None
 
     def forward(self, X):
-        # TODO: Implement forward pass
-        # Your final implementation shouldn't have any loops
-        raise Exception("Not implemented!")
+        self.X = X.copy()
+
+        return self.X.dot(self.W.value) + self.B.value
 
     def backward(self, d_out):
         """
@@ -170,10 +173,14 @@ class FullyConnectedLayer:
         # It should be pretty similar to linear classifier from
         # the previous assignment
 
-#        raise Exception("Not implemented!")
+        self.W.grad = self.X.T.dot(d_out)
+        self.B.grad = np.ones(shape=(1, self.X.shape[0])).dot(d_out)
 
-#        return d_input
-        return None
+        return d_out.dot(self.W.value.T)
 
     def params(self):
         return {'W': self.W, 'B': self.B}
+
+    def reset_grad(self):
+        self.W.grad = np.zeros_like(self.W.value)
+        self.B.grad = np.zeros_like(self.B.value)
