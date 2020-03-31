@@ -86,7 +86,7 @@ class Trainer:
         loss_history = []
         train_acc_history = []
         val_acc_history = []
-        
+
         for epoch in range(self.num_epochs):
             shuffled_indices = np.arange(num_train)
             np.random.shuffle(shuffled_indices)
@@ -102,11 +102,11 @@ class Trainer:
 
                 loss = self.model.compute_loss_and_gradients(X=X_batch, y=y_batch)
 
-            for param_name, param in self.model.params().items():
-                    optimizer = self.optimizers[param_name]
-                    param.value = optimizer.update(param.value, param.grad, self.learning_rate)
+                for param_name, param in self.model.params().items():
+                        optimizer = self.optimizers[param_name]
+                        param.value = optimizer.update(param.value, param.grad, self.learning_rate)
 
-            batch_losses.append(loss)
+                batch_losses.append(loss)
 
             if np.not_equal(self.learning_rate_decay, 1.0):
                 self.learning_rate *= self.learning_rate_decay
@@ -119,7 +119,8 @@ class Trainer:
             val_accuracy = self.compute_accuracy(self.dataset.val_X,
                                                  self.dataset.val_y)
 
-            print("Loss: %f, Train accuracy: %f, val accuracy: %f" %
+            if epoch % 100 == 0:
+                print("Loss: %f, Train accuracy: %f, val accuracy: %f" %
                   (batch_losses[-1], train_accuracy, val_accuracy))
 
             loss_history.append(ave_loss)
